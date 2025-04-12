@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">🌾 Welcome to FarmFresh</h1>
+    <p class="lead">Buy paddy and grains directly from farmers with UPI payments.</p>
+    <hr class="my-4">
+    <p>Support local farmers and get fresh, high-quality produce at fair prices.</p>
+    <a class="btn btn-success btn-lg" href="{{ url_for('customer.products') }}" role="button">Browse Products</a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Featured Products</h2>
+    </div>
+</div>
+
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            {% if product.image_url %}
+            <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/default-product.jpg') }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description|truncate(100) }}</p>
+                <p class="card-text"><strong>₹{{ product.price }}/kg</strong></p>
+                <a href="{{ url_for('customer.product_details', id=product.id) }}" class="btn btn-primary">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center">
+        <p>No products available at the moment.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="card-title">👨‍🌾 For Farmers</h3>
+                <p class="card-text">List your paddy and grains for sale directly to customers.</p>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success">Register as Farmer</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="card-title">🛒 For Customers</h3>
+                <p class="card-text">Buy fresh paddy and grains directly from farmers.</p>
+                <a href="{{ url_for('customer.products') }}" class="btn btn-outline-primary">Shop Now</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="card-title">💳 Easy Payments</h3>
+                <p class="card-text">Secure UPI payments for all transactions.</p>
+                <a href="{{ url_for('main.about') }}" class="btn btn-outline-info">Learn More</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

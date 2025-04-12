@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - FarmFresh{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Contact Us</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Get in Touch</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Information</h5>
+                    <p><strong>Email:</strong> info@farmfresh.com</p>
+                    <p><strong>Phone:</strong> +91 1234567890</p>
+                    <p><strong>Address:</strong> 123 Farm Road, Agri District, India</p>
+                    
+                    <h5 class="mt-4">Business Hours</h5>
+                    <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                    <p>Saturday: 10:00 AM - 4:00 PM</p>
+                    <p>Sunday: Closed</p>
+                    
+                    <h5 class="mt-4">Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="bi bi-facebook"></i> Facebook</a>
+                        <a href="#" class="me-3"><i class="bi bi-twitter"></i> Twitter</a>
+                        <a href="#" class="me-3"><i class="bi bi-instagram"></i> Instagram</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - FarmFresh{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Browse Products</h1>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filter by Category</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('customer.products') }}" class="list-group-item list-group-item-action {% if not request.args.get('category') %}active{% endif %}">
+                            All Categories
+                        </a>
+                        {% for category in categories %}
+                        <a href="{{ url_for('customer.products', category=category[0]) }}" class="list-group-item list-group-item-action {% if request.args.get('category') == category[0] %}active{% endif %}">
+                            {{ category[0]|capitalize }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ url_for('customer.products') }}" method="GET" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Search products..." value="{{ request.args.get('search', '') }}">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if product.image_url %}
+                        <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/default-product.jpg') }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description|truncate(100) }}</p>
+                            <p class="card-text"><strong>₹{{ product.price }}/kg</strong></p>
+                            <p class="card-text"><small class="text-muted">Available: {{ product.quantity }} kg</small></p>
+                            <div class="d-grid">
+                                <a href="{{ url_for('customer.product_details', id=product.id) }}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <p class="mb-0">No products found. Try a different search or category.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

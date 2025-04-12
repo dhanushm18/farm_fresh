@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - FarmFresh{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('customer.products') }}">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-5">
+            {% if product.image_url %}
+            <img src="{{ url_for('static', filename=product.image_url) }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 400px; width: 100%; object-fit: contain;">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/default-product.jpg') }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 400px; width: 100%; object-fit: contain;">
+            {% endif %}
+        </div>
+
+        <div class="col-md-7">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted">Category: {{ product.category|capitalize }}</p>
+
+            <div class="mb-3">
+                <h3 class="text-primary">₹{{ product.price }}/kg</h3>
+                <p><span class="badge bg-success">In Stock</span> {{ product.quantity }} kg available</p>
+            </div>
+
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="mb-4">
+                <h5>Seller Information</h5>
+                <p><strong>Farm:</strong> {{ product.seller.farm_name or 'N/A' }}</p>
+                <p><strong>Location:</strong> {{ product.seller.farm_location or 'N/A' }}</p>
+            </div>
+
+            {% if current_user.is_authenticated and current_user.user_type == 'customer' %}
+            <form action="{{ url_for('customer.add_to_cart', product_id=product.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-auto">
+                        <label for="quantity" class="col-form-label">Quantity (kg):</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="0.5" max="{{ product.quantity }}" step="0.5">
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">Add to Cart</button>
+                </div>
+            </form>
+            {% elif not current_user.is_authenticated %}
+            <div class="alert alert-info">
+                <p class="mb-0">Please <a href="{{ url_for('auth.login') }}">login</a> to add this product to your cart.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

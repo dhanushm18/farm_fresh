@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - User Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-4">User Details</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.users') }}">Users</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ user.username }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">User Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Username:</strong> {{ user.username }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>User Type:</strong> 
+                        {% if user.user_type == 'admin' %}
+                        <span class="badge bg-danger">Admin</span>
+                        {% elif user.user_type == 'farmer' %}
+                        <span class="badge bg-success">Farmer</span>
+                        {% elif user.user_type == 'customer' %}
+                        <span class="badge bg-primary">Customer</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </div>
+                    
+                    {% if user.user_type == 'farmer' %}
+                    <hr>
+                    <h6 class="mb-3">Farmer Details</h6>
+                    <div class="mb-3">
+                        <strong>Farm Name:</strong> {{ user.farm_name or 'Not provided' }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Farm Location:</strong> {{ user.farm_location or 'Not provided' }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong> {{ user.phone or 'Not provided' }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Back to Users</a>
+                    {% if user.id != current_user.id %}
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete User</button>
+                    
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteUserModalLabel">Confirm Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete user <strong>{{ user.username }}</strong>?
+                                    <p class="text-danger mt-2">This action cannot be undone and will delete all associated data.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            {% if user.user_type == 'farmer' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Products</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.products %}
+                    <div class="list-group">
+                        {% for product in user.products %}
+                        <a href="{{ url_for('admin.product_details', id=product.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ product.name }}</h6>
+                                <small>₹{{ product.price }}</small>
+                            </div>
+                            <p class="mb-1">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                            <small>Quantity: {{ product.quantity }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No products found for this farmer.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        {% if user.user_type == 'customer' %}
+                        Orders Placed
+                        {% elif user.user_type == 'farmer' %}
+                        Orders Received
+                        {% else %}
+                        Orders
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user.user_type == 'customer' and user.orders_placed %}
+                    <div class="list-group">
+                        {% for order in user.orders_placed %}
+                        <a href="{{ url_for('admin.order_details', id=order.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Order #{{ order.order_number }}</h6>
+                                <small>{{ order.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="mb-1">Amount: ₹{{ order.total_amount }}</p>
+                            <small>
+                                Status: 
+                                {% if order.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif order.status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                                {% elif order.status == 'shipped' %}
+                                <span class="badge bg-info">Shipped</span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="badge bg-primary">Delivered</span>
+                                {% elif order.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ order.status }}</span>
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% elif user.user_type == 'farmer' and user.orders_received %}
+                    <div class="list-group">
+                        {% for order in user.orders_received %}
+                        <a href="{{ url_for('admin.order_details', id=order.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Order #{{ order.order_number }}</h6>
+                                <small>{{ order.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="mb-1">Amount: ₹{{ order.total_amount }}</p>
+                            <small>
+                                Status: 
+                                {% if order.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif order.status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                                {% elif order.status == 'shipped' %}
+                                <span class="badge bg-info">Shipped</span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="badge bg-primary">Delivered</span>
+                                {% elif order.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ order.status }}</span>
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No orders found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

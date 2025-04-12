@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Product Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-4">Product Details</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.products') }}">Products</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            {% if product.image_url %}
+            <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}" class="img-fluid rounded mb-4">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/default-product.jpg') }}" alt="{{ product.name }}" class="img-fluid rounded mb-4">
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Product Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Name:</strong> {{ product.name }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Description:</strong> {{ product.description }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Price:</strong> ₹{{ product.price }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Quantity:</strong> {{ product.quantity }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Category:</strong> {{ product.category }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Seller:</strong> <a href="{{ url_for('admin.user_details', id=product.seller_id) }}">{{ product.seller.username }}</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Created:</strong> {{ product.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Back to Products</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal">Delete Product</button>
+                    
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteProductModalLabel">Confirm Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete product <strong>{{ product.name }}</strong>?
+                                    <p class="text-danger mt-2">This action cannot be undone.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('admin.delete_product', id=product.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order History</h5>
+                </div>
+                <div class="card-body">
+                    {% if product.order_items %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in product.order_items %}
+                                <tr>
+                                    <td>{{ item.order.order_number }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.user_details', id=item.order.customer_id) }}">{{ item.order.customer.username }}</a>
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.price }}</td>
+                                    <td>₹{{ item.quantity * item.price }}</td>
+                                    <td>{{ item.order.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.order_details', id=item.order_id) }}" class="btn btn-sm btn-primary">View Order</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No order history found for this product.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
