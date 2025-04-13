@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: farmfresh
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c gunicorn_config.py 'app:create_app()'
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URI
+        value: sqlite:///farmfresh.db
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false

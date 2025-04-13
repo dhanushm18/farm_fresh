@@ -215,6 +215,55 @@ To test the application, follow these steps:
 
 This project is licensed under the MIT License.
 
+## Deployment
+
+### Deploying to Render
+
+1. Create an account on [Render](https://render.com/)
+2. Click on the "New +" button and select "Blueprint"
+3. Connect your GitHub repository
+4. Render will automatically detect the `render.yaml` file and set up your services
+5. Configure the environment variables:
+   - `SECRET_KEY`: Render will generate this automatically
+   - `DATABASE_URI`: For production, consider using a PostgreSQL database
+   - `RAZORPAY_KEY_ID`: Your Razorpay Key ID
+   - `RAZORPAY_KEY_SECRET`: Your Razorpay Key Secret
+6. Click "Apply" to deploy your application
+
+### Deploying to Heroku
+
+1. Create an account on [Heroku](https://www.heroku.com/)
+2. Install the Heroku CLI and login:
+   ```bash
+   heroku login
+   ```
+3. Create a new Heroku app:
+   ```bash
+   heroku create your-app-name
+   ```
+4. Add a PostgreSQL database:
+   ```bash
+   heroku addons:create heroku-postgresql:hobby-dev
+   ```
+5. Set environment variables:
+   ```bash
+   heroku config:set SECRET_KEY=your_secret_key
+   heroku config:set RAZORPAY_KEY_ID=your_razorpay_key_id
+   heroku config:set RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+   ```
+6. Push to Heroku:
+   ```bash
+   git push heroku main
+   ```
+7. Initialize the database:
+   ```bash
+   heroku run python -c "from app import create_app; from app import db; app = create_app(); with app.app_context(): db.create_all()"
+   ```
+8. Create an admin user:
+   ```bash
+   heroku run python create_admin.py admin admin@farmfresh.com admin_password
+   ```
+
 ## Contributing
 
 1. Fork the repository

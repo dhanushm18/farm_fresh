@@ -12,3 +12,5 @@ click==8.1.8
 blinker==1.9.0
 sqlalchemy==2.0.40
 wtforms==3.2.1
+gunicorn==21.2.0
+Pillow==10.1.0
