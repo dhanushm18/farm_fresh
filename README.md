@@ -2,6 +2,18 @@
 
 **FarmFresh** is a comprehensive web application that connects farmers directly with customers, eliminating middlemen and ensuring fair prices for both parties. This platform allows farmers to list their products and customers to purchase them directly, with support for **UPI-based payments through Razorpay**. Built with **Python Flask**, Bootstrap, and integrated with **Razorpay** for secure payments.
 
+## 🔗 Live Demo
+
+**Check out the live demo:** [https://farm-fresh-fffa.onrender.com/](https://farm-fresh-fffa.onrender.com/)
+
+### Demo Credentials
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | admin | admin123 |
+| Farmer | farmer1 | password123 |
+| Customer | customer1 | password123 |
+
 ## 📌 Table of Contents
 
 - [🚀 Features](#-features)
@@ -176,13 +188,31 @@ farm_fresh/
 
 ## 💳 Payment Integration
 
-The application uses Razorpay for payment processing. For testing, you can use the following credentials:
+The application uses Razorpay for payment processing. The live demo is configured with Razorpay test mode.
 
-- **Test Card**: 4111 1111 1111 1111
+### Testing Payments in the Demo
+
+To test the payment system in the demo:
+
+1. Log in as a customer (username: `customer1`, password: `password123`)
+2. Browse products and add them to your cart
+3. Proceed to checkout and enter shipping information
+4. On the payment page, click "Pay Now with UPI/Card/NetBanking"
+5. Use one of the following test payment methods:
+
+#### Test Card
+- **Card Number**: 4111 1111 1111 1111
 - **Expiry**: Any future date
 - **CVV**: Any 3-digit number
 - **Name**: Any name
-- **Test UPI**: success@razorpay
+
+#### Test UPI
+- **UPI ID**: success@razorpay
+
+#### Test NetBanking
+- Select any bank and click "Success" on the test page
+
+After completing the test payment, you'll be redirected back to the application and your order will be marked as paid.
 
 ## 🧪 Testing
 
@@ -217,18 +247,31 @@ This project is licensed under the MIT License.
 
 ## Deployment
 
-### Deploying to Render
+### Current Deployment
+
+The application is currently deployed on Render.com and can be accessed at:
+[https://farm-fresh-fffa.onrender.com/](https://farm-fresh-fffa.onrender.com/)
+
+The deployment includes:
+- Automatic database initialization with admin user and sample data
+- Razorpay payment integration in test mode
+- Responsive design for mobile and desktop
+
+### Deploying Your Own Instance
 
 1. Create an account on [Render](https://render.com/)
-2. Click on the "New +" button and select "Blueprint"
+2. Click on the "New +" button and select "Web Service"
 3. Connect your GitHub repository
-4. Render will automatically detect the `render.yaml` file and set up your services
+4. Configure the service:
+   - **Environment**: Python
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn -c gunicorn_config.py 'app:create_app()'`
 5. Configure the environment variables:
-   - `SECRET_KEY`: Render will generate this automatically
-   - `DATABASE_URI`: For production, consider using a PostgreSQL database
+   - `SECRET_KEY`: A secure random string
+   - `DATABASE_URI`: `sqlite:///farmfresh.db` (or use PostgreSQL for production)
    - `RAZORPAY_KEY_ID`: Your Razorpay Key ID
    - `RAZORPAY_KEY_SECRET`: Your Razorpay Key Secret
-6. Click "Apply" to deploy your application
+6. Click "Create Web Service" to deploy your application
 
 ### Deploying to Heroku
 
